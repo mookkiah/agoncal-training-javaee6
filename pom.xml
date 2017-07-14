@@ -39,10 +39,18 @@
     <dependencies>
         <!--This has most of the needed dependencies : Derby, JPA, EJB, Java EE 6...-->
         <dependency>
-            <groupId>org.glassfish.main.extras</groupId>
-            <artifactId>glassfish-embedded-all</artifactId>
-            <version>${version.glassfish}</version>
-        </dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>tomee-embedded</artifactId>
+			<version>1.7.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.13.1.1</version>
+			<scope>test</scope>
+		</dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
