@@ -1,35 +1,32 @@
 package org.agoncal.training.javaee.model;
 
-import org.agoncal.training.javaee.model.Book;
-import org.agoncal.training.javaee.model.Language;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.agoncal.training.javaee.repository.BookRepository;
+import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
- * @author Antonio Goncalves
+ * @author Antonio Goncalves, Mahendran Mookkiah
  */
+@RunWith(CdiTestRunner.class)
 public class BookTest {
 
     // ======================================
     // =             Attributes             =
     // ======================================
 
-    private static String PERSISTENCE_UNIT_NAME = "trainingPU";
-
-    private EntityManagerFactory emf;
-    private EntityManager em;
-    private EntityTransaction tx;
+    @Inject
+    private BookRepository bookRepository;
 
     // ======================================
     // =          Lifecycle Methods         =
@@ -37,15 +34,11 @@ public class BookTest {
 
     @Before
     public void init() {
-        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-        em = emf.createEntityManager();
-        tx = em.getTransaction();
+        
     }
 
     @After
     public void close() {
-        em.close();
-        emf.close();
     }
 
     // ======================================
@@ -59,31 +52,25 @@ public class BookTest {
         Book book = new Book("H2G2", 12.5f, "Best IT Scifi Book", "1234-5678-5678", 247, false, Language.ENGLISH);
 
         // Persists the book
-        tx.begin();
-        em.persist(book);
-        tx.commit();
+        bookRepository.save(book);
         Long id = book.getId();
 
         // Finds the book by primary key
-        book = em.find(Book.class, id);
+        book = bookRepository.findBy(id);
         assertEquals(book.getTitle(), "H2G2");
 
         // Updates the book
-        tx.begin();
         book.setTitle("Hitchhiker's Guide");
-        tx.commit();
 
         // Finds the book by primary key
-        book = em.find(Book.class, id);
+        book = bookRepository.findBy(id);
         assertEquals(book.getTitle(), "Hitchhiker's Guide");
 
         // Deletes the book
-        tx.begin();
-        em.remove(book);
-        tx.commit();
+        bookRepository.remove(book);
 
         // Checks the book has been deleted
-        assertNull("Book should has been deleted", em.find(Book.class, id));
+        assertNull("Book should has been deleted", bookRepository.findBy(id));
     }
 
     @Test
@@ -97,25 +84,21 @@ public class BookTest {
         book.setTags(tags);
 
         // Persists the book
-        tx.begin();
-        em.persist(book);
-        tx.commit();
+        bookRepository.save(book);
         Long id = book.getId();
 
         // Finds the book by primary key
-        book = em.find(Book.class, id);
+        book = bookRepository.findBy(id);
         assertEquals(book.getTitle(), "H2G2");
 
         // Checks the number of tags
         assertEquals(book.getTags().size(), 2);
 
         // Deletes the book
-        tx.begin();
-        em.remove(book);
-        tx.commit();
+        bookRepository.remove(book);
 
         // Checks the book has been deleted
-        assertNull("Book should has been deleted", em.find(Book.class, id));
+        assertNull("Book should has been deleted", bookRepository.findBy(id));
     }
 
     @Test(expected = Exception.class)
@@ -125,9 +108,7 @@ public class BookTest {
         Book book = new Book(null, 12.5f, "Best IT Scifi Book", "1234-5678-5678", 247, false, Language.ENGLISH);
 
         // Persists the book
-        tx.begin();
-        em.persist(book);
-        tx.commit();
+        bookRepository.save(book);
     }
 
     @Test
@@ -137,29 +118,23 @@ public class BookTest {
         Book book = new Book("H2G2", 12.5f, "Best IT Scifi Book", "1234-5678-5678", 247, false, Language.ENGLISH);
 
         // Persists the book
-        tx.begin();
-        em.persist(book);
-        tx.commit();
+        bookRepository.save(book);
         Long id = book.getId();
 
         // Finds the book by primary key
-        book = em.find(Book.class, id);
+        book = bookRepository.findBy(id);
         assertEquals(book.getContentLanguage(), Language.ENGLISH);
 
         // Updates the book
-        tx.begin();
         book.setContentLanguage(Language.FRENCH);
-        tx.commit();
 
         // Finds the book by primary key
-        book = em.find(Book.class, id);
+        book = bookRepository.findBy(id);
         assertEquals(book.getContentLanguage(), Language.FRENCH);
 
         // Deletes the book
-        tx.begin();
-        em.remove(book);
-        tx.commit();
+        bookRepository.remove(book);
 
-        assertNull("Book should has been deleted", em.find(Book.class, id));
+        assertNull("Book should has been deleted", bookRepository.findBy(id));
     }
 }
